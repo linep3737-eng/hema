@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>هيما</title>
+<style>
+:root{--bg:#FFF4D6;--ink:#3B2A1A;--c1:#FF6B5A;--c2:#2EB8A6;--c3:#FFC83D;--c4:#6C8CFF}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,Arial,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--c3);border-bottom:6px solid var(--ink)}
+header h1{margin:0;font-size:30px}
+#back{display:none;font-size:30px;border:0;background:#fff;border-radius:50%;width:54px;height:54px;border:4px solid var(--ink)}
+main{flex:1;overflow-y:auto;padding:14px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:100%;align-content:center}
+.menu button{font-size:26px;font-weight:700;border:5px solid var(--ink);border-radius:28px;padding:22px 8px;color:var(--ink);box-shadow:0 7px 0 var(--ink)}
+.menu button span{display:block;font-size:64px;line-height:1.1}
+.menu button:active,.card:active{transform:translateY(5px);box-shadow:none}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:#fff;border:4px solid var(--ink);border-radius:22px;text-align:center;padding:10px 4px;box-shadow:0 5px 0 var(--ink);font-size:16px;font-weight:700}
+.card .big{font-size:52px;line-height:1.15;display:block}
+.card small{display:block;font-size:14px;opacity:.75}
+.sw{height:56px;border-radius:14px;border:3px solid var(--ink);margin-bottom:4px}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.q{font-size:26px;font-weight:700;line-height:1.5}
+.say{font-size:20px;border:4px solid var(--ink);background:var(--c2);color:#fff;border-radius:40px;padding:8px 22px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.opts .card{font-size:60px;padding:18px 0}
+.ok{animation:pop .5s}.no{animation:shake .4s}
+@keyframes pop{50%{transform:scale(1.25) rotate(6deg)}}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+#pop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;font-size:25vw;background:rgba(255,244,214,.88);z-index:9;text-align:center}
+#pop p{font-size:7vw;margin:0}
+@media (prefers-reduced-motion:reduce){.ok,.no{animation:none}}
+</style>
+</head>
+<body>
+<header><h1 id="title">أهلاً يا هيما 👋</h1><button id="back" aria-label="رجوع">⬅️</button></header>
+<main id="main"></main>
+<div id="pop"><div id="popin"></div></div>
+<script>
+const A=[["🐱","قطة","Cat"],["🐶","كلب","Dog"],["🐮","بقرة","Cow"],["🐑","خروف","Sheep"],["🐴","حصان","Horse"],["🐔","دجاجة","Chicken"],["🦆","بطة","Duck"],["🐷","خنزير","Pig"],["🐐","ماعز","Goat"],["🐫","جمل","Camel"],["🐘","فيل","Elephant"],["🦁","أسد","Lion"],["🐯","نمر","Tiger"],["🐻","دب","Bear"],["🐵","قرد","Monkey"],["🦒","زرافة","Giraffe"],["🦓","حمار وحشي","Zebra"],["🐰","أرنب","Rabbit"],["🐭","فأر","Mouse"],["🐸","ضفدع","Frog"],["🐟","سمكة","Fish"],["🐢","سلحفاة","Turtle"],["🐍","ثعبان","Snake"],["🦅","نسر","Eagle"],["🦉","بومة","Owl"],["🐧","بطريق","Penguin"],["🐬","دولفين","Dolphin"],["🦀","سلطعون","Crab"],["🐝","نحلة","Bee"],["🦋","فراشة","Butterfly"]];
+const S=[["مياااو","Meow"],["هاو هاو","Woof woof"],["موووو","Moo"],["مااااع","Baa"],["ايهيهيهي","Neigh"],["كتكت كتكت","Cluck cluck"],["كواك كواك","Quack quack"],["أونك أونك","Oink oink"],["ميييه","Maa"],["غرررر","Grrr"],["بروووم","Toot"],["غرررر","Roar"],["غرررر","Roar"],["غرررر","Growl"],["أوو أوو أااا","Ooh ooh aah"],["هممم","Hmm"],["ايهيهيهي","Neigh"],["تب تب","Thump thump"],["إيك إيك","Squeak"],["نق نق","Ribbit"],["بلوب بلوب","Blub blub"],["ببطء ببطء","Slowly"],["سسسسس","Hiss"],["كييييي","Screech"],["هووو هووو","Hoot hoot"],["كااااك","Squawk"],["إيك إيك إيك","Click click"],["طق طق","Click clack"],["ززززز","Buzz"],["رفرفة رفرفة","Flutter"]];
+function playSound(i){let done=false;const fb=()=>{if(done)return;done=true;say([ar(S[i][0]),en(S[i][1])])};
+ try{const f=new Audio("sounds/"+A[i][2].toLowerCase().replace(/ /g,"")+".mp3");f.onerror=fb;const p=f.play();if(p&&p.catch)p.catch(fb)}catch(e){fb()}}
+const C=[["#E53935","أحمر","Red"],["#1E88E5","أزرق","Blue"],["#FDD835","أصفر","Yellow"],["#43A047","أخضر","Green"],["#FB8C00","برتقالي","Orange"],["#8E24AA","بنفسجي","Purple"],["#F48FB1","وردي","Pink"],["#FFFFFF","أبيض","White"],["#212121","أسود","Black"],["#795548","بني","Brown"]];
+const AL=[["أ","أرنب"],["ب","بطة"],["ت","تفاحة"],["ث","ثعلب"],["ج","جمل"],["ح","حصان"],["خ","خروف"],["د","دب"],["ذ","ذرة"],["ر","رمان"],["ز","زرافة"],["س","سمكة"],["ش","شمس"],["ص","صقر"],["ض","ضفدع"],["ط","طائر"],["ظ","ظبي"],["ع","عين"],["غ","غراب"],["ف","فيل"],["ق","قطة"],["ك","كلب"],["ل","ليمون"],["م","موزة"],["ن","نحلة"],["هـ","هدهد"],["و","وردة"],["ي","يد"]];
+const EW="Apple Ball Cat Dog Egg Fish Grapes Hat Ice Juice Kite Lion Moon Nest Orange Pig Queen Rain Sun Tree Umbrella Van Water X-ray Yo-yo Zebra".split(" ");
+const EL=[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map((l,i)=>[l,EW[i]]);
+const N=[["1","واحد","One"],["2","اثنان","Two"],["3","ثلاثة","Three"],["4","أربعة","Four"],["5","خمسة","Five"],["6","ستة","Six"],["7","سبعة","Seven"],["8","ثمانية","Eight"],["9","تسعة","Nine"],["10","عشرة","Ten"]];
+const $=s=>document.querySelector(s),main=$("#main"),back=$("#back"),title=$("#title");
+let voices=[];function loadV(){voices=speechSynthesis.getVoices()}
+if("speechSynthesis" in window){loadV();speechSynthesis.onvoiceschanged=loadV}
+function say(parts,done){ // parts: [[text,lang],...]
+ if(!("speechSynthesis" in window)){if(done)done();return}
+ speechSynthesis.cancel();
+ parts.forEach(([t,l],k)=>{const u=new SpeechSynthesisUtterance(t);u.lang=l;u.rate=.8;u.pitch=1.25;if(done&&k==parts.length-1)u.onend=done;
+  const v=voices.find(v=>v.lang.replace("_","-").toLowerCase().startsWith(l.slice(0,2)));if(v)u.voice=v;speechSynthesis.speak(u)});
+}
+const ar=t=>[t,"ar-SA"],en=t=>[t,"en-US"];
+const sayBoth=(a,e)=>say([ar(a),en(e)]);
+function cheer(){const m=["برافو يا هيما!","شاطر يا هيما!","ممتاز يا هيما!","أحسنت يا هيما!"][Math.random()*4|0];
+ $("#popin").innerHTML="⭐🎉<p>"+m+"</p>";$("#pop").style.display="flex";say([ar(m),en("Great job Hema!")]);
+ setTimeout(()=>$("#pop").style.display="none",1800);}
+const rnd=(a,n)=>[...a].sort(()=>Math.random()-.5).slice(0,n);
+
+function home(){back.style.display="none";title.textContent="أهلاً يا هيما 👋";
+ const items=[["🐘","الحيوانات","#FFB4A8",animals],["🎨","الألوان","#B8E6DF",colors],["🔤","الحروف","#C9D6FF",letters],["🔢","الأرقام","#FFE49A",numbers],["❓","أسئلة","#E3C9FF",quiz]];
+ main.innerHTML='<div class="menu">'+items.map((x,i)=>`<button data-i="${i}" style="background:${x[2]}"><span>${x[0]}</span>${x[1]}</button>`).join("")+"</div>";
+ main.querySelectorAll("button").forEach(b=>b.onclick=()=>{const x=items[b.dataset.i];back.style.display="block";title.textContent=x[1];x[3]();});
+ say([ar("أهلاً يا هيما! يلا نلعب"),en("Hello Hema! Let's play")]);}
+back.onclick=home;
+
+function animals(){main.innerHTML='<div class="grid">'+A.map((a,i)=>`<div class="card" data-i="${i}"><span class="big">${a[0]}</span>${a[1]}<small>${a[2]}</small></div>`).join("")+"</div>";
+ main.querySelectorAll(".card").forEach(c=>c.onclick=()=>{const i=+c.dataset.i,a=A[i];say([ar(a[1]),en(a[2])],()=>playSound(i))});}
+function colors(){main.innerHTML='<div class="grid">'+C.map((a,i)=>`<div class="card" data-i="${i}"><div class="sw" style="background:${a[0]}"></div>${a[1]}<small>${a[2]}</small></div>`).join("")+"</div>";
+ main.querySelectorAll(".card").forEach(c=>c.onclick=()=>{const a=C[c.dataset.i];sayBoth(a[1],a[2])});}
+function letters(){main.innerHTML='<div class="stage"><div class="q">الحروف العربية</div><div class="grid" id="g1" style="width:100%"></div><div class="q">English Letters</div><div class="grid" id="g2" style="width:100%"></div></div>';
+ $("#g1").innerHTML=AL.map((a,i)=>`<div class="card" data-i="${i}"><span class="big">${a[0]}</span>${a[1]}</div>`).join("");
+ $("#g2").innerHTML=EL.map((a,i)=>`<div class="card" data-i="${i}"><span class="big" dir="ltr">${a[0]}</span><span dir="ltr">${a[1]}</span></div>`).join("");
+ $("#g1").querySelectorAll(".card").forEach(c=>c.onclick=()=>{const a=AL[c.dataset.i];say([ar(a[0].replace("ـ","")+"... "+a[1])])});
+ $("#g2").querySelectorAll(".card").forEach(c=>c.onclick=()=>{const a=EL[c.dataset.i];say([en(a[0]+"... "+a[1])])});}
+function numbers(){main.innerHTML='<div class="grid">'+N.map((a,i)=>`<div class="card" data-i="${i}"><span class="big">${a[0]}</span><div style="font-size:15px">${"⭐".repeat(+a[0])}</div>${a[1]}<small>${a[2]}</small></div>`).join("")+"</div>";
+ main.querySelectorAll(".card").forEach(c=>c.onclick=()=>{const a=N[c.dataset.i];sayBoth(a[1],a[2])});}
+
+let qn=0;
+function quiz(){const kind=qn++%3; // 0 animal, 1 color, 2 number
+ let pool,item,opts,qa,qe,render;
+ if(kind==0){pool=rnd(A,3);item=pool[0];qa="فين ال"+item[1]+"؟";qe="Where is the "+item[2]+"?";render=o=>o[0]}
+ else if(kind==1){pool=rnd(C.slice(0,7),3);item=pool[0];qa="فين اللون ال"+item[1]+"؟";qe="Where is "+item[2]+"?";render=o=>`<div class="sw" style="height:70px;margin:0 8px;background:${o[0]}"></div>`}
+ else{pool=rnd(N.slice(0,5),3);item=pool[0];qa="فين الرقم "+item[1]+"؟";qe="Where is number "+item[2]+"?";render=o=>o[0]}
+ opts=rnd(pool,3);
+ main.innerHTML=`<div class="stage"><div class="q">${qa}<br><span dir="ltr">${qe}</span></div><button class="say" id="rep">🔊 اسمع تاني</button><div class="opts">${opts.map((o,i)=>`<div class="card" data-i="${i}">${render(o)}</div>`).join("")}</div></div>`;
+ const ask=()=>say([ar(qa),en(qe)]);$("#rep").onclick=ask;setTimeout(ask,300);
+ main.querySelectorAll(".opts .card").forEach(c=>c.onclick=()=>{
+  if(opts[c.dataset.i]===item){c.classList.add("ok");cheer();setTimeout(quiz,2000)}
+  else{c.classList.add("no");say([ar("حاول تاني يا هيما"),en("Try again")]);setTimeout(()=>c.classList.remove("no"),500)}});}
+home();
+</script>
+</body>
+</html>
